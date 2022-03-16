@@ -4,13 +4,13 @@ const CACHE_NAME = 'pwa-sample-caches-v1';
 const urlsToCache = [
   './',
   './index.html',
-  './pages/a.html',
-  './pages/b.html',
-  './pages/c.html',
-  './css/style.css',
-  './images/a.jpg',
-  './images/b.jpg',
-  './images/c.jpg',
+  './audio-worklet.js',
+  './dark.css',
+  './icon.png',
+  './localforage.js',
+  './manifest.json',
+  './nds.js',
+  './nds.wasm',
 ];
 
 self.addEventListener('install', (event) => {
