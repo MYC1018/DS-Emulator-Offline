@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="icon.png"> 
 <link rel="preload" href="audio-worklet.js" as="script"> 
 <link href="dark.css" rel="stylesheet"> 
-<title>DS Player</title> 
+<title>DS Emulator</title> 
 </head> 
 
 <body> 
@@ -110,16 +110,14 @@ background-color: rgba(255, 255, 255, 0.75) !important
 } 
 </style> 
 <div id="welcome" class="menu"> 
-<h1>DS Player</h1> 
-<div id="loading">Loading...</div> 
+<h1>DSエミュレータ</h1> 
+<div id="loading">読み込み中</div> 
 <div id="loadrom" hidden> 
 <input id="rom" type="file" hidden> 
-<button style="width:calc(100% - 2em);margin: 1em;" onclick="$id('rom').click()">Choose File...</button> 
+<button style="width:calc(100% - 2em);margin: 1em;" onclick="$id('rom').click()">ファイルを選択</button> 
 </div> 
 <hr> 
-<a target="_blank" href="https://github.com/44670/desmume-wasm">https://github.com/44670/desmume-wasm</a> 
-<p>Ver. 20211122 <a href="#" onclick="whatsNew()">What's new?</a></p> 
-<p><a href="#" onclick="uiSwitchTo('menu')">⚙ Settings...</a></p> 
+<p><a href="#" onclick="uiSwitchTo('menu')">⚙ 設定</a></p> 
 <div id="ios-hint" hidden> 
 Due to iOS Safari limitations, you may need to add this page to your home screen before you can save the 
 game. 
@@ -147,13 +145,13 @@ game.
 <button onclick="uiMenuBack()">❮ Back</button> 
 <hr> 
 <input type="checkbox" id="power-save"> 
-<label for="power-save">Power-save mode</label><br> 
+<label for="power-save">省電力モード</label><br> 
 <input type="checkbox" id="vk-enabled"> 
-<label for="vk-enabled">Virtual keyboard</label><br> 
+<label for="vk-enabled">仮想キーボード</label><br> 
 <hr> 
 <div id="menu-savegame" hidden> 
 <input type="file" id="restore-file" onchange="uiSaveRestore()" hidden> 
-Save Data: <button onclick="uiSaveBackup()">↓ Export</button>|<button onclick="$id('restore-file').click()">↑ Import</button> 
+セーブデータ: <button onclick="uiSaveBackup()">↓ エクスポート</button>|<button onclick="$id('restore-file').click()">↑ インポート</button> 
 <hr> 
 </div> 
 </div> 
