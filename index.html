@@ -133,8 +133,8 @@
     <div id="welcome" class="menu">
         <h1>DS Player</h1>
         <div id="loading">Loading...</div>
-        <div id="loadrom" hidden>
-            <input id="rom" type="file" hidden>
+        <div id="loadrom">
+            <input id="rom" type="file">
             <button style="width:calc(100% - 2em);margin: 1em;" id="btn-choose-file">Choose File (or
                 drag/drop)...</button><br>
         </div>
@@ -161,15 +161,15 @@
 
         <div id="pro" style="background-color: #333">
         </div>
-        <p id="ios-power-hint" hidden>
+        <p id="ios-power-hint">
             Please <b>turn off "Low Power Mode"</b> in iOS Control Center for better performance.<br>The battery icon is yellow if it's enabled.
         </p>
-        <div id="ios-hint" hidden>
+        <div id="ios-hint">
             Due to iOS limitations, please open this site(https://ds.44670.org) in <b>Safari</b>, and add it to your
             <b>Home Screen</b> by <b>Share Menu</b> to continue.
             <p style="text-align: center;">⬇⬇⬇</p>
         </div>
-        <div id="mac-warning" hidden>
+        <div id="mac-warning">
             WARNING:<br>
             It looks like you are using macOS.<br>
             Due to macOS Safari <a href="https://webkit.org/tracking-prevention/">limitations</a>, ALL of you save data
@@ -178,7 +178,7 @@
                 href="https://www.google.com/chrome/">Chrome</a>)
         </div>
     </div>
-    <div id="vk-layer" hidden>
+    <div id="vk-layer">
         <div class="vk-rect vk" data-k="menu" id="vk-menu">M</div>
         <div class="vk-rect vk" data-k="l">L</div>
         <div class="vk-rect vk" data-k="r">R</div>
@@ -196,7 +196,7 @@
     <div id="msg-layer" hidden>
         <p id="msg-text"></p>
     </div>
-    <div id="menu" hidden>
+    <div id="menu">
         <button onclick="uiMenuBack()">❮ Back</button>
         <hr>
         <div id="cfg-ea">
@@ -242,14 +242,14 @@
         </select>
 
         <hr>
-        <div id="menu-savegame" hidden>
+        <div id="menu-savegame">
             <input type="file" id="restore-file" onchange="uiSaveRestore()" hidden>
             Save Data: <button onclick="uiSaveExport()">↓ Backup</button>|<button
                 onclick="$id('restore-file').click()">↑ Restore</button><br>
             <hr>
         </div>
     </div>
-    <div id="player" hidden>
+    <div id="player">
         <canvas id="top" width="256" height="192"></canvas>
         <canvas id="bottom" width="256" height="192"></canvas>
     </div>
