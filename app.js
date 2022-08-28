@@ -244,7 +244,7 @@ function checkSaveGame() {
         var savBuf = emuCopySavBuffer()
         if (savBuf.length > 0) {
             localforage.setItem('sav-' + gameID, savBuf)
-            showMsg('Auto saving...')
+            showMsg('自動保存')
         }
     }
     prevSaveFlag = saveUpdateFlag
