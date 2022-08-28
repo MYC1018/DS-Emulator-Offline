@@ -11,7 +11,7 @@ class MyAudioWorklet extends AudioWorkletProcessor {
             var buf = e.data
             var samplesReceived = buf.length / 2
             if (this.fifoLen + samplesReceived >= this.FIFO_CAP) {
-                console.log('o')
+                //console.log('o')
                 return
             }
 
@@ -41,7 +41,7 @@ class MyAudioWorklet extends AudioWorkletProcessor {
 
         for (var i = 0; i < chan0.length; i++) {
             if (this.fifoLen < 1) {
-                console.log("u")
+                //console.log("u")
                 break
             }
             chan0[i] = this.fifo0[this.fifoHead] / 32768.0
