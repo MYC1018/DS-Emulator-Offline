@@ -52,17 +52,17 @@ async function uiSaveRestore() {
         return
     }
     if (file.size > 2.2 * 1024 * 1024) {
-        alert('Too large!');
+        alert('大きすぎます');
         return
     }
     // Only .dsv files are supported
     if (!file.name.endsWith('.dsv')) {
-        alert('Only .dsv files are supported.\nUse an online converter if your save is in different format.');
+        alert('dsvファイルのみサポートします。\n保存の形式が異なる場合は、オンラインコンバーターを使用してください。');
         return
     }
     var u8 = new Uint8Array(await file.arrayBuffer())
     localforage.setItem('sav-' + gameID, u8).then(() => {
-        alert('Save data updated. \nThis page will be reloaded to apply the changes.')
+        alert('セーブデータアップロード完了 \nこのページは変更を適用するためにリロードされます。')
         setTimeout(() => {
             location.href = 'https://ds.44670.org'
         }, 1000)
@@ -459,15 +459,15 @@ fileInput.onchange = async () => {
         alert('plugin loaded!')
         return
     } else if (fileNameLower.endsWith('.gba')) {
-        alert('This is a GBA file, redirecting to the GBA player...')
+        alert('これはGBAファイルで、GBAプレーヤーにリダイレクトされます。')
         window.location.href = '/gba';
     } else if (fileNameLower.endsWith('.zip')) {
-        alert('ZIP file not supported yet!')
+        alert('ZIPファイルはまだサポートされていません!')
     } else if (fileNameLower.endsWith('.nds')) {
         tryLoadROM(file)
         return
     } else {
-        alert('Unknown file type!')
+        alert('不明なファイルタイプ')
     }
 }
 
@@ -483,7 +483,7 @@ function tryInitSound() {
         }
         audioContext = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 0.0001, sampleRate: 48000 });
         if (!audioContext.audioWorklet) {
-            alert('AudioWorklet is not supported in your browser...')
+            alert('AudioWorkletはブラウザでサポートされていません')
         } else {
             audioContext.audioWorklet.addModule("audio-worklet.js").then(() => {
                 audioWorkletNode = new AudioWorkletNode(audioContext, "my-worklet", { outputChannelCount: [2] })
@@ -733,7 +733,7 @@ window.addEventListener("gamepadconnected", function (e) {
         e.gamepad.buttons.length, e.gamepad.axes.length);
     showMsg('Gamepad connected.')
     currentConnectedGamepad = e.gamepad.index
-    $id('a-gamepad').innerText = 'Gamepad connected'
+    $id('a-gamepad').innerText = 'コントローラ接続済み'
 });
 
 function processGamepadInput() {
@@ -742,7 +742,7 @@ function processGamepadInput() {
     }
     var gamepad = navigator.getGamepads()[currentConnectedGamepad]
     if (!gamepad) {
-        showMsg('Gamepad disconnected.')
+        showMsg('ゲームパッドが切断されました。')
         currentConnectedGamepad = -1
         return
     }
@@ -781,7 +781,7 @@ function whatsNew() {
 var isMicrophoneEnabled = false
 function enableMicrophone() {
     if (isMicrophoneEnabled) {
-        alert('Microphone is already enabled.')
+        alert('マイクはすでに有効になっています。')
         return
     }
     isMicrophoneEnabled = true
