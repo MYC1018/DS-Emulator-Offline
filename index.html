@@ -135,47 +135,36 @@
         <div id="loading">Loading...</div>
         <div id="loadrom" hidden>
             <input id="rom" type="file" hidden>
-            <button style="width:calc(100% - 2em);margin: 1em;" id="btn-choose-file">Choose File (or
-                drag/drop)...</button><br>
+            <button style="width:calc(100% - 2em);margin: 1em;" id="btn-choose-file">ROMを選択(.nds)</button><br>
         </div>
         <p style="color: #888;">
-            Your files are processed locally and won't be uploaded to any server.<br>
-            This software should not be used to play games you have not legally obtained.<br>
-            "Nintendo DS" is a trademark of Nintendo. This site is not associated with Nintendo in any way.
+            アップロードされたファイルはローカルで処理され、どのサーバーにもアップロードされません。<br>
+            ソフトウェアで違法にコピーされたようなゲームはプレイしないでください。<br>
+            Nintendo DSは任天堂株式会社の商標登録です。このサイトは任天堂とは一切関係ありません。
         </p>
         <hr>
-        <p><span id="ver-info"></span><a onclick="whatsNew()" id="whats-new" href="#">What's New</a>&nbsp;|&nbsp;<a
-                href="#" onclick="uiSwitchTo('menu')">⚙ Settings...</a></p>
+        <p><span id="ver-info"></span><a onclick="whatsNew()" id="whats-new" href="#">新着情報</a>&nbsp;|&nbsp;<a
+                href="#" onclick="uiSwitchTo('menu')">設定</a></p>
         <p id="p-sns">
             <a href="/gba/">GBA Player</a>
         </p>
         <p>
-            <a href="https://github.com/44670/desmume-wasm">Help</a>&nbsp;|&nbsp;<a href="#" id="a-gamepad">No
-                Gamepad</a>
+            <a href="#" id="a-gamepad">コントローラ未接続</a>
         </p>
         <p>
-            Powered by <a
-                href="https://github.com/44670/desmume-wasm">desmume-wasm.</a>&nbsp;|&nbsp;https://ds.44670.org<br>
+            Powered by desmume-wasm.
         </p>
-
 
         <div id="pro" style="background-color: #333">
         </div>
         <p id="ios-power-hint" hidden>
-            Please <b>turn off "Low Power Mode"</b> in iOS Control Center for better performance.<br>The battery icon is yellow if it's enabled.
+            パフォーマンスを向上させるには、iOS コントロール センターで「低電力モード」をオフにしてください。 <br>有効になっている場合、バッテリー アイコンは黄色です。
         </p>
         <div id="ios-hint" hidden>
-            Due to iOS limitations, please open this site(https://ds.44670.org) in <b>Safari</b>, and add it to your
-            <b>Home Screen</b> by <b>Share Menu</b> to continue.
-            <p style="text-align: center;">⬇⬇⬇</p>
+           iOSの制限により、このサイトをホーム画面に追加してください。
         </div>
         <div id="mac-warning" hidden>
-            WARNING:<br>
-            It looks like you are using macOS.<br>
-            Due to macOS Safari <a href="https://webkit.org/tracking-prevention/">limitations</a>, ALL of you save data
-            will be LOST after 7 days of inactivity.<br>
-            For this reason, it is highly recommended to use a different browser. (For example: <a
-                href="https://www.google.com/chrome/">Chrome</a>)
+            macOS を使用しているようです。macOS Safari の制限により、7日間使用しないとすべての保存データが失われます。<br>このため、別のブラウザを使用することを強くお勧めします。
         </div>
     </div>
     <div id="vk-layer" hidden>
@@ -197,7 +186,7 @@
         <p id="msg-text"></p>
     </div>
     <div id="menu" hidden>
-        <button onclick="uiMenuBack()">❮ Back</button>
+        <button onclick="uiMenuBack()">❮ 戻る</button>
         <hr>
         <div id="cfg-ea" hidden>
             <b>Early Access features</b><br>
@@ -221,31 +210,31 @@
         </div>
         <hr>
         <input type="checkbox" id="power-save">
-        <label for="power-save">30FPS limit</label><br>
+        <label for="power-save">30FPS制限</label><br>
         <input type="checkbox" id="vk-enabled">
-        <label for="vk-enabled">Virtual gamepad</label><br>
+        <label for="vk-enabled">仮想コントローラ</label><br>
         <input type="checkbox" id="cfg-mute-sound">
-        <label for="cfg-mute-sound">Mute sound</label><br>
-        <label for="vk-direction">Virtual gamepad Style</label>
+        <label for="cfg-mute-sound">消音</label><br>
+        <label for="vk-direction">仮想コントローラスタイル</label>
         <select id="vk-direction" value="">
-            <option value="0">Circle-Pad</option>
-            <option value="1">D-Pad</option>
+            <option value="0">スティック操作</option>
+            <option value="1">十字キー操作</option>
         </select><br>
-        <label for="cfg-lang">Firmware Language</label>
+        <label for="cfg-lang">ファームウェア言語</label>
         <select id="cfg-lang">
-            <option value="0">Japanese</option>
-            <option value="1">English</option>
-            <option value="2">French</option>
-            <option value="3">German</option>
-            <option value="4">Italian</option>
-            <option value="5">Spanish</option>
+            <option value="0">日本語</option>
+            <option value="1">英語</option>
+            <option value="2">フランス語</option>
+            <option value="3">ドイツ語</option>
+            <option value="4">イタリア語</option>
+            <option value="5">スペイン語</option>
         </select>
 
         <hr>
         <div id="menu-savegame" hidden>
             <input type="file" id="restore-file" onchange="uiSaveRestore()" hidden>
-            Save Data: <button onclick="uiSaveExport()">↓ Backup</button>|<button
-                onclick="$id('restore-file').click()">↑ Restore</button><br>
+            Save Data: <button onclick="uiSaveExport()">↓ バックアップ</button>|<button
+                onclick="$id('restore-file').click()">↑ 読み込む</button><br>
             <hr>
         </div>
     </div>
