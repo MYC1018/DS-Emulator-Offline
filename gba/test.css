@@ -1,4 +1,4 @@
-button {
+#bt-rom {
     color: #fff;
     background-color: var(--background);
     font-family: inherit;
@@ -9,7 +9,7 @@ button {
     outline: none;
 }
 
-button:active {
+#bt-rom:active {
     background-color: var(--button-hover);
 }
 
