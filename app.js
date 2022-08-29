@@ -52,22 +52,25 @@ async function uiSaveRestore() {
         return
     }
     if (file.size > 2.2 * 1024 * 1024) {
-        alert('大きすぎます');
+        alert('Too large!');
         return
     }
     // Only .dsv files are supported
     if (!file.name.endsWith('.dsv')) {
-        alert('dsvファイルのみサポートします。\n保存の形式が異なる場合は、オンラインコンバーターを使用してください。');
+        alert('Only .dsv files are supported.\nUse an online converter if your save is in different format.');
         return
     }
     var u8 = new Uint8Array(await file.arrayBuffer())
     localforage.setItem('sav-' + gameID, u8).then(() => {
-        alert('セーブデータアップロード完了 \nこのページは変更を適用するためにリロードされます。')
+        alert('Save data updated. \nThis page will be reloaded to apply the changes.')
         setTimeout(() => {
-            location.href = 'https://ds.44670.org'
+            location.href = 'https://ds-emulator-offline.vercel.app'
         }, 1000)
     })
 }
+
+
+
 
 
 
