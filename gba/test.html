@@ -15,42 +15,78 @@
 
 <body>
     <style>
-        a,
-        a:visited {
-            color: white;
-        }
-
+     
         html,
         body {
-            position: fixed;
-            overflow: hidden;
+            overflow-x: hidden;
             -webkit-user-select: none;
             user-select: none;
-            -webkit-touch-callout:none;
-            touch-action: none;
+            -webkit-touch-callout: none;
             cursor: inherit;
         }
 
         body {
-
-            background-color: #000000;
-            color: #FFFFFF;
+            background-color: black;
+            color: white;
             padding: 0;
             margin: 0;
             width: 100vw;
             height: 100vh;
-            font-family: 'Myriad Set Pro','Helvetica Neue',Helvetica,Arial,sans-serif;
+            font-family: 'Myriad Set Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
 
-        hr {
-            color: white;
+        canvas {
+            position: absolute;
+            z-index: 1;
         }
 
-        button {
-            border: 2px solid white;
+        #msg-layer {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            top: 40vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 3;
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+        }
+
+        #vk-layer {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            touch-action: none;
+            opacity: 0.3;
+        }
+
+        #menu {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 4;
+            overflow: hidden scroll;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+        }
+
+        #menu button {
             background: transparent;
+        }
+
+        #menu button:active {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        a,
+        a:visited {
             color: white;
-            padding: .5em;
+
         }
 
         .vk-round {
@@ -60,10 +96,15 @@
             display: inline-block;
         }
 
+        .vk-round-rect {
+            border-radius: 0.5em;
+            display: inline-block;
+        }
+
 
         .vk {
-            color: rgba(0, 0, 0, 0.2);
-            background-color: rgba(255, 255, 255, 0.25);
+            color: #000;
+            background-color: #fff;
             position: absolute;
             z-index: 1;
             text-align: center;
@@ -71,48 +112,81 @@
             display: inline-block;
         }
 
-        .vk-hide {
-            background-color: transparent !important
+
+
+
+        .vk-touched {}
+
+        .link {
+            text-decoration: underline;
         }
 
-        .vk-touched {
-            background-color: rgba(255, 255, 255, 0.75) !important
-        }
+        hr {
+            border: 1px solid #fff;
+            height: 0;
+        }   
+        /*inspired by water.css*/
+:root {
+    --background-body: #202b38;
+    --background: #161f27;
+    --background-alt: #1a242f;
+    --selection: #1c76c5;
+    --text-main: #dbdbdb;
+    --text-bright: #fff;
+    --text-muted: #a9b1ba;
+    --links: #41adff;
+    --focus: #0096bfab;
+    --border: #526980;
+    --code: #ffbe85;
+    --animation-duration: 0.1s;
+    --button-hover: #324759;
+    --scrollbar-thumb: var(--button-hover);
+    --scrollbar-thumb-hover: rgb(65, 92, 115);
+    --form-placeholder: #a9a9a9;
+    --form-text: #fff;
+    --variable: #d941e2;
+    --highlight: #efdb43;
+    --active: #1c76c5;
+  }
 
-        .menu {
-            background: rgb(32,43,56);
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 999;
-        }
+button {
+    color: #fff;
+    background-color: var(--background);
+    font-family: inherit;
+    font-size: inherit;
+    padding: 10px;
+    border: 2px white solid;
+    border-radius: 6px;
+    outline: none;
+}
 
-        #gba-canvas {
-            position: absolute;
-            z-index: -1;
-            image-rendering: pixelated;
-        }
+button:active {
+    background-color: var(--button-hover);
+}
 
-        #vk-layer {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 3;
-            touch-action: none;
-        }
+input {
+    font-family: inherit;
+    font-size: inherit;
+    margin-right: 6px;
+    margin-bottom: 6px;
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+    color: var(--form-text);
+    background-color: var(--background);
+}
 
-        #msg-layer {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            top: 40vh;
-            background:rgba(0,0,0,0.5);
-            z-index: 2;
-        }
+::placeholder {
+    color: #a9a9a9;
+    color: var(--form-placeholder);
+}
+  
+
+body {
+    font-family: system-ui, -apple-system, sans-serif;
+    line-height: 1.2;
+    color: white;
+}
     </style>
     <div id="pause-menu" class="menu" style="background: rgba(32,43,56,0.7);" hidden>
         <h1><button onclick="setPauseMenu(false)"> ← Back </button>Game Paused</h1>
