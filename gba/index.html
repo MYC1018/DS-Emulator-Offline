@@ -129,10 +129,10 @@
         <button onclick="savRestoreBtn()">Restore</button>
     </div>
     <div id="welcome" class="menu">
-        <h2>GBA Player</h2>
+        <h2>GBAエミュレータ</h2>
         <hr>
         <div id="wasm-loading">
-            Loading WebAssembly, please wait...
+            WebAssemblyを読み込んでいます。お待ちください
         </div>
         <div id="select-rom" hidden>
 <input type="file" id="romFile" onchange="onFileSelected()" hidden /></p>
@@ -140,13 +140,12 @@
 
         </div>
         <hr>
-        Ver. 20220318
         <p>
-            This software should not be used to play games you have not legally obtained.
+            このソフトウェアは、合法的に入手していないゲームをプレイするために使用しないでください。
         </p>
         <div id="ios-hint" hidden>
-            Due to limitations of iOS, please <b>add this page to the home screen</b> and launch it from the home screen icon to enable features including savegame and full screen.
-            <p style="text-align: center;">👇</p>
+iOSの制限により、このページをホーム画面に追加し、ホーム画面のアイコンから起動して、セーブゲームやフルスクリーンなどの機能を有効にしてください。
+       
         </div>
     </div>
     <div id="msg-layer" hidden>
@@ -198,7 +197,7 @@
                 // On iOS Safari, the indexedDB will be cleared after 7 days. 
                 // To prevent users from frustration, we don't allow savegaming on iOS unless the we are in the PWA mode.
                 isSaveSupported = false
-                alert('Due to limitations of iOS, please add this page to the home screen and launch it from the home screen icon to enable features including savegame and full screen.')
+                alert('iOSの制限により、このページをホーム画面に追加し、ホーム画面のアイコンから起動して、セーブゲームやフルスクリーンなどの機能を有効にしてください。')
                 var divIosHint = document.getElementById('ios-hint')
                 divIosHint.hidden = false
                 divIosHint.style = 'position: absolute; bottom: '+ divIosHint.clientHeight  + 'px;'
@@ -396,7 +395,7 @@
             var u8 = new Uint8Array(arrayBuffer)
             gameID = ""
             if (u8[0xB2] != 0x96) {
-                alert('Not a valid GBA ROM!')
+                alert('有効なGBA ROMではありません')
                 return
             }
             for (var i = 0xAC; i < 0xB2; i++) {
@@ -429,7 +428,7 @@
                 return
             }
             romFileName = fn
-            document.getElementById('select-rom').innerText = 'Downloading...'
+            document.getElementById('select-rom').innerText = 'ダウンロード中'
             fetch('roms/' + fn + '.gba').then(function (resp) {
                 resp.arrayBuffer().then(function (ab) {
                     loadRomArrayBuffer(ab)
@@ -439,14 +438,14 @@
 
         function onFileSelected() {
             if (!isWasmReady) {
-                alert('WASM not ready!')
+                alert('WASMの準備ができていません')
                 return
             }
             tryInitSound()
             var file = fileInput.files[0]
             var fileNameLower = file.name.toLowerCase()
             if (!fileNameLower.endsWith('.gba')) {
-                alert('Please select a .gba file.')
+                alert('.gbaファイルを選択してください。')
                 return
             }
             if (file) {
@@ -672,7 +671,7 @@
             console.log("Gamepad connected at index %d: %s. %d buttons, %d axes.",
                 e.gamepad.index, e.gamepad.id,
                 e.gamepad.buttons.length, e.gamepad.axes.length);
-            showMsg('Gamepad connected.')
+            showMsg('ゲームパッドが接続されました。')
             currentConnectedGamepad = e.gamepad.index
         });
 
@@ -682,7 +681,7 @@
             }
             var gamepad = navigator.getGamepads()[currentConnectedGamepad]
             if (!gamepad) {
-                showMsg('Gamepad disconnected.')
+                showMsg('ゲームパッドが切断されました。')
                 currentConnectedGamepad = -1
                 return
             }
@@ -830,7 +829,7 @@
         }
 
         localforage.ready().then(function () { }).catch(function (err) {
-            alert('Save storage not supported: ' + err);
+            alert('ストレージの保存はサポートされていません: ' + err);
         })
 
         function chtWriteBtn() {
