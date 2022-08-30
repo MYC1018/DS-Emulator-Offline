@@ -73,7 +73,7 @@ input {
     border-radius: 6px;
     padding: 10px;
     color: var(--form-text);
-    background-color: navy;
+    background-color: var(--background);
 }
 
 ::placeholder {
@@ -209,7 +209,7 @@ body {
         </div>
         <div id="select-rom" hidden>
 <input type="file" id="romFile" onchange="onFileSelected()" hidden /></p>
-<button onclick="$id('romFile').click()" style="width:calc(100% - 2em);margin: 1em;">Choose File...</button>
+<button onclick="$id('romFile').click()" style="width:calc(100% - 2em);margin: 1em;background-color:navy;">Choose File...</button>
 
         </div>
         
