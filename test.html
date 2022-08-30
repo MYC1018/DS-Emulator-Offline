@@ -173,6 +173,77 @@ body {
     inset -0.0625em 0 rgba(255,255,255,0.08);
 }
 </style>
+  <style id="webmakerstyle">
+* {
+  box-sizing: border-box; }
+
+:root {
+  --hue: 200;
+  --surface: hsl(var(--hue) 0% 15%);
+  --text: hsl(var(--hue) 10% 95%);
+  --text-size: 2rem;
+  --brand-1: hsl(var(--hue) 80% 80%);
+  --outline-1: hsl(var(--hue) 10% 30%);
+  --outline-2: hsl(var(--hue) 100% 50%);
+  --outline-3: hsl(var(--hue) 100% 80%);
+  --red: hsla(10 100% 55%);
+  --yellow: hsl(50 100% 55%);
+  --blue: hsl(220 100% 55%);
+  --steel: hsl(var(--hue) 10% 12%);
+  --game-size: min(400px);
+  --spacing: 8px; }
+
+@media only screen and (max-height: 600px) {
+  :root {
+    --text-size: 1rem; } }
+
+.material-icons,
+.material-icons-outlined {
+  font-size: var(--text-size);
+  user-select: none;
+  color: var(--text); }
+
+html {
+  font-family: Whitney, Helvetica Neue, Helvetica, Arial, sans-serif;
+  background: var(--surface);
+  scroll-behavior: smooth; }
+
+.game-list {
+  display: grid;
+  place-items: center;
+  grid-auto-columns: var(--game-size);
+  grid-template-rows: var(--game-size);
+  grid-auto-flow: column;
+  list-style-type: none;
+  justify-items: center;
+  align-items: center;
+  padding: 0 calc(var(--spacing) * 16); }
+  .game-list > li {
+    scroll-margin: calc(var(--spacing) * 16);
+    height: var(--game-size);
+    width: calc(var(--game-size));
+    pointer-events: none; }
+    .game-list > li > a {
+      height: 100%;
+      width: 100%;
+      display: block;
+      margin: auto;
+      pointer-events: all;
+      border: calc(var(--spacing) / 2) solid transparent;
+      padding: calc(var(--spacing) / 2); }
+      .game-list > li > a > img {
+        height: 100%;
+        width: 100%; }
+    .game-list > li:target > a {
+      animation: game-active 0.5s linear alternate infinite; }
+
+@keyframes game-active {
+  from {
+    border-color: var(--outline-2); }
+  to {
+    border-color: var(--outline-3); } }
+
+</style>
 </head>
 <body>
 
@@ -185,7 +256,22 @@ body {
       </div>
 
     
+ <ul class="game-list">
+      <li id='splatoon'>
+        <a href='#splatoon'>
+          <img src='http://ds-emulator-offline.vercel.app/icon.png'>
+        </a>
+      </li>
+      <li id='super-smash-bros'>
+        <a href='#super-smash-bros'>
+          <img
+            src='http://ds-emulator-offline.vercel.app/gba/icon.png'>
+        </a>
+      </li>
 
+      
+  
+    </ul>
 <script src="filesystem:https://webmaker.app/temporary/script.js">
 </script>
 </body>
