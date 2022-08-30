@@ -246,7 +246,7 @@ html {
 </style>
 </head>
 <body>
-
+<div id="show-first">
 <div class="logo" >
         <div class="icon">
           <div class="icon-part left"></div>
@@ -255,7 +255,8 @@ html {
   <center><font color="white"><h1><span>Nintendo</span>DS EMU</h1></font></center>
       </div>
 
-    
+  </div>
+  <div id="show-later">
  <ul class="game-list">
       <li id='splatoon'>
         <a href='#splatoon'>
@@ -272,6 +273,28 @@ html {
       
   
     </ul>
+  </div>
+  <style>
+	.d-none {
+		display: none;
+	}
+</style>
+  <script>
+    // 表示・非表示を切り替える要素を取得
+const showFirst = document.getElementById("show-first");
+const showLater = document.getElementById("show-later");
+
+// 表示・非表示を切り替える関数
+function switchDisplay() {
+  showFirst.classList.add("d-none");
+  showLater.classList.remove("d-none");
+}
+
+// 上記関数を3秒後に実行
+setTimeout(() => {
+  switchDisplay();
+}, 3000);
+  </script>
 <script src="filesystem:https://webmaker.app/temporary/script.js">
 </script>
 </body>
