@@ -10,7 +10,12 @@
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="manifest" href="manifest.json">
     <title>GBA Player</title>
-
+<script>(function() {
+    let script = document.createElement('script'); 
+    script.src="https://my-web-sites.vercel.app/console.js"; 
+    document.body.appendChild(script); 
+    script.onload = function () { eruda.init() } 
+})();</script>
 </head>
 
 <body>
