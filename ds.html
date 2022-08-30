@@ -1,13 +1,8 @@
-<!DOCTYPE html>
-<html lang="en" >
-<head>
-  <meta charset="UTF-8">
-  <title>CodePen - Nintendo DS Lite</title>
-  <link rel="stylesheet" href="./style.css">
 
-</head>
-<body>
-<!-- partial:index.partial.html -->
+<div id="player" hidden>
+
+  
+<style src="style.css"></style>
 <div class="container">
         <div class="topbody">
             <div class="inner-topbody">
@@ -65,7 +60,7 @@
                         </table>
                     </div>
                     <div class="screen-outer">
-                        <div class="screen-inner"></div>
+                        <div class="screen-inner"><canvas id="top" width="100%" height="100%"></canvas></div>
                     </div>
                     <div class="black-square blk-top-left"></div>
                     <div class="black-square blk-top-right"></div>
@@ -85,7 +80,7 @@
         <div class="botbody">
             <div class="dark-inner-bot">
                 <div class="screen-outer">
-                    <div class="screen-inner"></div>
+                    <div class="screen-inner"><canvas id="bottom" width="100%" height="100%"></canvas></div>
                 </div>
                 <div class="buttons-box">
                     <table>
@@ -143,7 +138,5 @@
             </div>
         </div>
     </div>
-<!-- partial -->
-  
-</body>
-</html>
+  </div> 
+
