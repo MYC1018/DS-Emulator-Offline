@@ -189,7 +189,18 @@ body {
         }
     </style>
     <div id="pause-menu" class="menu" style="background: rgba(32,43,56,0.7);" hidden>
-        <h1><button onclick="setPauseMenu(false)"> ← 戻る </button>ゲーム一時停止</h1>
+        <h1><button onclick="setPauseMenu(false)"> ← 戻る </button>ゲーム一時停止<input type="button" value="リロード" id="btnReload">
+
+<script>
+let d = new Date();
+let element = document.getElementById('msg');
+element.insertAdjacentHTML('afterend', '<p>' + d.toTimeString() + '</p>');
+
+let btnReload = document.getElementById('btnReload');
+btnReload.addEventListener('click', function(){
+    location.reload();
+});
+</script></h1>
         <hr>
         Memory Hacking:<br>
         <input id="cht-addr" value="0x">
