@@ -1,6 +1,6 @@
 {
-    "name": "DS Player",
-    "short_name": "DS",
+    "name": "DeSmuME Lite",
+    "short_name": "DeSmuME Lite",
     "start_url": ".",
     "display": "fullscreen",
     "background_color": "black",
