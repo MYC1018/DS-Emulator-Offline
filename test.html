@@ -244,13 +244,20 @@ game.
 <div id="msg-layer" hidden> 
 <p id="msg-text"></p> 
 </div> 
-<script>
-document.querySelector('.btn').addEventListener('click', ()=>{
-    location.reload();
-}, false);
-</script>
+
 <div id="menu" hidden> 
-<button onclick="uiMenuBack()">❮ Back</button> <button class="btn" type="button">リロード</button>
+	<button onclick="uiMenuBack()">❮ Back</button><input type="button" value="reload" id="btnReload">
+
+<script>
+
+
+let btnReload = document.getElementById('btnReload');
+btnReload.addEventListener('click', function(){
+    location.reload();
+});
+</script>
+	
+
 <hr> 
 <input type="checkbox" id="power-save"> 
 <label for="power-save">省電力モード</label><br> 
