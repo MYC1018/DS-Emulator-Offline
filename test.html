@@ -244,8 +244,13 @@ game.
 <div id="msg-layer" hidden> 
 <p id="msg-text"></p> 
 </div> 
+<script>
+document.querySelector('.btn').addEventListener('click', ()=>{
+    location.reload();
+}, false);
+</script>
 <div id="menu" hidden> 
-<button onclick="uiMenuBack()">❮ Back</button> 
+<button onclick="uiMenuBack()">❮ Back</button> <button class="btn" type="button">リロード</button>
 <hr> 
 <input type="checkbox" id="power-save"> 
 <label for="power-save">省電力モード</label><br> 
