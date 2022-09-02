@@ -1,6 +1,25 @@
+<!doctype html>
 <html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="viewport"
+        content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link href="dark.css" rel="stylesheet">
+    <title>DS Player</title>
+    <!-- Add hint for search engine -->
+    <meta name="description"
+        content="DS Player is a web emulator for playing NDS and GBA games, designed for iOS(iPhone and iPad) and also workable for other devices.">
+    <meta name="keywords" content="NDS, GBA, iOS, iPhone, iPad, emulator, DS, Safari, online, PWA">
+    <meta name="author" content="44670">
+</head>
+
 <body>
-<style>
+    <style>
         html,
         body {
             overflow-x: hidden;
@@ -9,7 +28,7 @@
             -webkit-touch-callout: none;
             cursor: inherit;
         }
- 
+
         body {
             background-color: black;
             color: white;
@@ -19,12 +38,12 @@
             height: 100vh;
             font-family: 'Myriad Set Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
- 
+
         canvas {
             position: absolute;
             z-index: 1;
         }
- 
+
         #msg-layer {
             position: absolute;
             left: 0;
@@ -35,7 +54,7 @@
             backdrop-filter: blur(3px);
             -webkit-backdrop-filter: blur(3px);
         }
- 
+
         #vk-layer {
             position: absolute;
             left: 0;
@@ -46,7 +65,7 @@
             touch-action: none;
             opacity: 0.3;
         }
- 
+
         #menu {
             position: absolute;
             left: 0;
@@ -59,34 +78,34 @@
             backdrop-filter: blur(3px);
             -webkit-backdrop-filter: blur(3px);
         }
- 
+
         #menu button {
             background: transparent;
         }
- 
+
         #menu button:active {
             background: rgba(255, 255, 255, 0.5);
         }
- 
+
         a,
         a:visited {
             color: white;
- 
+
         }
- 
+
         .vk-round {
             text-align: center;
             vertical-align: middle;
             border-radius: 50%;
             display: inline-block;
         }
- 
+
         .vk-round-rect {
             border-radius: 0.5em;
             display: inline-block;
         }
- 
- 
+
+
         .vk {
             color: #000;
             background-color: #fff;
@@ -96,16 +115,16 @@
             vertical-align: middle;
             display: inline-block;
         }
- 
- 
- 
- 
+
+
+
+
         .vk-touched {}
- 
+
         .link {
             text-decoration: underline;
         }
- 
+
         hr {
             border: 1px solid #fff;
             height: 0;
@@ -125,19 +144,21 @@
             "Nintendo DS" is a trademark of Nintendo. This site is not associated with Nintendo in any way.
         </p>
         <hr>
-        <p><span id="ver-info"></span><a onclick="whatsNew()" id="whats-new" href="#">What's New</a> | <a href="#" onclick="uiSwitchTo('menu')">⚙ Settings...</a></p>
+        <p><span id="ver-info"></span><a onclick="whatsNew()" id="whats-new" href="#">What's New</a>&nbsp;|&nbsp;<a
+                href="#" onclick="uiSwitchTo('menu')">⚙ Settings...</a></p>
         <p id="p-sns">
-            <a href="/web/20220826025609/https://ds.44670.org/gba/">GBA Player</a>
+            <a href="/gba/">GBA Player</a>
         </p>
         <p>
-            <a href="https://web.archive.org/web/20220826025609/https://github.com/44670/desmume-wasm">Help</a> | <a href="#" id="a-gamepad">No
+            <a href="https://github.com/44670/desmume-wasm">Help</a>&nbsp;|&nbsp;<a href="#" id="a-gamepad">No
                 Gamepad</a>
         </p>
         <p>
-            Powered by <a href="https://web.archive.org/web/20220826025609/https://github.com/44670/desmume-wasm">desmume-wasm.</a> | https://ds.44670.org<br>
+            Powered by <a
+                href="https://github.com/44670/desmume-wasm">desmume-wasm.</a>&nbsp;|&nbsp;https://ds.44670.org<br>
         </p>
- 
- 
+
+
         <div id="pro" style="background-color: #333">
         </div>
         <p id="ios-power-hint" hidden>
@@ -151,9 +172,10 @@
         <div id="mac-warning" hidden>
             WARNING:<br>
             It looks like you are using macOS.<br>
-            Due to macOS Safari <a href="https://web.archive.org/web/20220826025609/https://webkit.org/tracking-prevention/">limitations</a>, ALL of you save data
+            Due to macOS Safari <a href="https://webkit.org/tracking-prevention/">limitations</a>, ALL of you save data
             will be LOST after 7 days of inactivity.<br>
-            For this reason, it is highly recommended to use a different browser. (For example: <a href="https://web.archive.org/web/20220826025609/https://www.google.com/chrome/">Chrome</a>)
+            For this reason, it is highly recommended to use a different browser. (For example: <a
+                href="https://www.google.com/chrome/">Chrome</a>)
         </div>
     </div>
     <div id="vk-layer" hidden>
@@ -218,11 +240,12 @@
             <option value="4">Italian</option>
             <option value="5">Spanish</option>
         </select>
- 
+
         <hr>
         <div id="menu-savegame" hidden>
             <input type="file" id="restore-file" onchange="uiSaveRestore()" hidden>
-            Save Data: <button onclick="uiSaveExport()">↓ Backup</button>|<button onclick="$id('restore-file').click()">↑ Restore</button><br>
+            Save Data: <button onclick="uiSaveExport()">↓ Backup</button>|<button
+                onclick="$id('restore-file').click()">↑ Restore</button><br>
             <hr>
         </div>
     </div>
@@ -230,10 +253,10 @@
         <canvas id="top" width="256" height="192"></canvas>
         <canvas id="bottom" width="256" height="192"></canvas>
     </div>
-    <script src="/localforage.js"></script>
-    <script src="/pako.min.js"></script>
-    <script src="/app.js"></script>
-    <script src="/build/nds.js"></script>
+    <script src="localforage.js"></script>
+    <script src="pako.min.js"></script>
+    <script src="app.js"></script>
+    <script src="build/nds.js"></script>
 </body>
- 
+
 </html>
