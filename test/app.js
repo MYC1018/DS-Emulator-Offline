@@ -67,17 +67,42 @@ async function uiSaveRestore() {
         alert('Too large!');
         return
     }
-    // Only .dsv files are supported
-    if (!file.name.endsWith('.dsv')) {
-        alert('Only .dsv files are supported.\nUse an online converter if your save is in different format.');
+    var fileExt = file.name.split('.').pop().toLowerCase()
+    var allowedExts = {'4dsav': true, 'sav': true, 'dsv': true, '4dsaz': true, 'dsz': true}
+    if (!allowedExts[fileExt]) {
+        alert('Invalid file extension: ' + fileExt)
         return
     }
-    var u8 = new Uint8Array(await file.arrayBuffer())
-    localforage.setItem('sav-' + gameID, u8).then(() => {
-        alert('Save data updated. \nThis page will be reloaded to apply the changes.')
+    var u8Arr = new Uint8Array(await file.arrayBuffer())
+    if (fileExt == '4dsav') { 
+        u8Arr = toyEncrypt(u8Arr)
+    }
+    if (fileExt == '4dsaz') {
+        // Use pako to decompress
+        u8Arr = pako.ungzip(toyEncrypt(u8Arr))
+    }
+    if (fileExt == 'dsz') {
+        u8Arr = pako.ungzip(u8Arr)
+    }
+    if (fileExt == 'sav') {
+        var origSave = emuCopySavBuffer()
+        if (origSave.length <= 0) {
+            alert('You have to save in the game at least once, before importing .sav file.')
+            return
+        }
+        if (u8Arr.length > origSave.length) {
+            alert('The .sav file is too large.')
+            return
+        }
+        // Copy the u8Arr to the beginning of origSave, overwriting the original save data.
+        origSave.set(u8Arr, 0)
+        u8Arr = origSave
+    }
+    localforage.setItem('sav-' + gameID, u8Arr).then(() => {
+        alert('Save data updated. \nPlease close and reopen this app.')
         setTimeout(() => {
-            location.href = 'https://ds.44670.org'
-        }, 1000)
+            location.reload()
+        }, 500)
     })
 }
 
