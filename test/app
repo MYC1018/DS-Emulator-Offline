@@ -37,12 +37,24 @@ function uiMenuBack() {
     }
 }
 
-function uiSaveBackup() {
-    var u8Arr = emuCopySavBuffer()
+function uiSaveExport() {
+    if (isSaveSupported) {
+        if (!confirm(`Auto-save is enabled, you DON'T have to export save data manually.
+After you saved in the game, wait a few seconds and save data will be stored in the app's local storage automatically.
+To prevent the data loss caused by accidential deletion of the Home Screen icon or damaged device, you may export the save data to a safe place.
+
+Do you wish to continue?`)) {
+            return
+        }
+        if (prompt('You HAVE to save in the game before exporting the save data.\n\nPlease enter "Yes" to confirm.') !== 'Yes') {
+            return
+        }
+    }
+    var u8Arr = pako.gzip(emuCopySavBuffer())
     var blob = new Blob([u8Arr], { type: "application/binary" });
     var link = document.createElement("a");
     link.href = window.URL.createObjectURL(blob);
-    link.download = 'sav-' + gameID + '.dsv';
+    link.download = 'sav-' + gameID + '.dsz';
     link.click();
 }
 
