@@ -147,7 +147,8 @@ const emuKeyNames = ["right", "left", "down", "up", "select", "start", "b", "a",
 var vkMap = {}
 var vkState = {}
 var keyNameToKeyId = {}
-var vkStickPos
+var vkStickPos = [0, 0, 0, 0, 0]
+var vkDPadRect = { x: 0, y: 0, w: 0, h: 0 }
 for (var i = 0; i < emuKeyNames.length; i++) {
     keyNameToKeyId[emuKeyNames[i]] = i
 }
@@ -164,12 +165,17 @@ var romSize = 0
 
 var FB = [0, 0]
 var screenCanvas = [document.getElementById('top'), document.getElementById('bottom')]
-var ctx2d = screenCanvas.map((v) => { return v.getContext('2d', { alpha: false }) })
+var ctx2d;
 
 var audioContext
 var audioBuffer
-var tmpAudioBuffer = new Int16Array(16384 * 2)
-var audioWorkletNode
+var scriptNode
+const audioFifoCap = 8192
+var audioFifoL = new Int16Array(audioFifoCap)
+var audioFifoR = new Int16Array(audioFifoCap)
+var audioFifoHead = 0
+var audioFifoLen = 0
+
 
 var frameCount = 0
 var prevCalcFPSTime = 0
@@ -376,6 +382,10 @@ function makeVKStyle(top, left, w, h, fontSize) {
     return 'top:' + top + 'px;left:' + left + 'px;width:' + w + 'px;height:' + h + 'px;' + 'font-size:' + fontSize + 'px;line-height:' + h + 'px;'
 }
 
+function makeVKStyle(top, left, w, h, fontSize) {
+    return 'top:' + top + 'px;left:' + left + 'px;width:' + w + 'px;height:' + h + 'px;' + 'font-size:' + fontSize + 'px;line-height:' + h + 'px;'
+}
+
 
 function uiAdjustVKLayout() {
     var baseSize = window.innerWidth * 0.14
@@ -392,6 +402,8 @@ function uiAdjustVKLayout() {
     fontSize = baseSize * 0.5
     vkMap['l'].style = makeVKStyle(offTop, 0, vkw, vkh, fontSize)
     vkMap['r'].style = makeVKStyle(offTop, window.innerWidth - vkw, vkw, vkh, fontSize)
+    vkw = baseSize * 0.4
+    vkh = baseSize * 0.4
     $id('vk-menu').style = makeVKStyle(offTop, window.innerWidth / 2 - vkw / 2, vkw, vkh, fontSize)
 
 
@@ -407,37 +419,93 @@ function uiAdjustVKLayout() {
     vkw = baseSize * 1.0
     vkh = baseSize * 1.0
     offLeft = 0
-    $id('vk-stick').style = makeVKStyle(offTop + abxyHeight / 2 - vkh / 2, offLeft + abxyHeight / 2 - vkw / 2, vkw, vkh, fontSize)
+    $id('vk-stick').style = config.useDPad ? 'display:none;' : makeVKStyle(offTop + abxyHeight / 2 - vkh / 2, offLeft + abxyHeight / 2 - vkw / 2, vkw, vkh, fontSize)
     vkStickPos = [offTop + abxyHeight / 2, offLeft + abxyHeight / 2, vkw, vkh, fontSize]
 
+    var dpadW = abxyWidth
+    var dpadH = abxyHeight
+    var dpadX = offLeft
+    var dpadY = offTop
+    vkDPadRect = { x: dpadX, y: dpadY, width: dpadW, height: dpadH }
+    $id('vk-dpad-1').style = config.useDPad ? makeVKStyle(dpadY + dpadH / 3, dpadX, dpadW, dpadH / 3, fontSize) : 'display:none;'
+    $id('vk-dpad-2').style = config.useDPad ? makeVKStyle(dpadY, dpadX + dpadW / 3, dpadW / 3, dpadH, fontSize) : 'display:none;'
     vkw = baseSize * 0.4
     vkh = baseSize * 0.4
-    fontSize = baseSize * 0.4
+    fontSize = baseSize * 0.2
     vkMap['select'].style = makeVKStyle(offTop + abxyHeight - vkh, window.innerWidth / 2 - vkw * 1.5, vkw, vkh, fontSize)
     vkMap['start'].style = makeVKStyle(offTop + abxyHeight - vkh, window.innerWidth / 2 + vkw * 0.5, vkw, vkh, fontSize)
 }
 
-function uiUpdateLayout() {
-    isLandscape = window.innerWidth > window.innerHeight
-    var maxWidth = window.innerWidth
-    var maxHeight = window.innerHeight / 2
+function maxScreenSize(maxWidth, maxHeight) {
     var w = maxWidth
     var h = w / 256 * 192
     if (h > maxHeight) {
         h = maxHeight
         w = h / 192 * 256
     }
-    var left = 0
-    left += (window.innerWidth - w) / 2;
-    var top = 0
+    return [w, h]
+}
 
-    fbSize = [[w, h], [w, h]]
-    for (var i = 0; i < 2; i++) {
-        screenCanvas[i].style = 'left:' + left + 'px;top:' + top + "px;width:" + w + "px;height:" + h + "px;"
-        top += h
+function setScreenPos(c, left, top, w, h) {
+    var sty ='left:' + left + 'px;top:' + top + "px;width:" + w + "px;height:" + h + "px;"
+    if (optScaleMode == 0) {
+        sty += 'image-rendering:pixelated;'
     }
+    c.style = sty
+    if (optScaleMode >= 2) {
+        var devicePixelRatio = window.devicePixelRatio || 1
+        c.width = w * devicePixelRatio
+        c.height = h * devicePixelRatio
+    }
+}
+
+
+function uiUpdateLayout() {
+    isLandscape = isScreenLandscape()
+    if ((!isLandscape) || (config.lsLayout == 0)) {
+        // Top-bottom
+        var maxWidth = window.innerWidth
+        var maxHeight = window.innerHeight / 2
+        var sz = maxScreenSize(maxWidth, maxHeight); var w = sz[0]; var h = sz[1];
+        var left = 0
+        left += (window.innerWidth - w) / 2;
+        var top = 0
+
+        fbSize = [[w, h], [w, h]]
+        for (var i = 0; i < 2; i++) {
+            setScreenPos(screenCanvas[i], left, top, fbSize[i][0], fbSize[i][1])
+            top += h
+        }
+    } else if (config.lsLayout == 1) {
+        // Left-right 1:1
+        var maxWidth = window.innerWidth / 2
+        var maxHeight = window.innerHeight
+        var sz = maxScreenSize(maxWidth, maxHeight); var w = sz[0]; var h = sz[1];
+        var left = 0
+        var top = 0
+        fbSize = [[w, h], [w, h]]
+        for (var i = 0; i < 2; i++) {
+            setScreenPos(screenCanvas[i], left, top, fbSize[i][0], fbSize[i][1])
+            left += w
+        }
+    } else if (config.lsLayout == 2) {
+        // Left-right X:1
+        var maxWidth = window.innerWidth - 256
+        var maxHeight = window.innerHeight
+        var sz = maxScreenSize(maxWidth, maxHeight); var w = sz[0]; var h = sz[1];
+        var left = 0
+        var top = 0
+        fbSize = [[w, h], [256, 192]]
+        for (var i = 0; i < 2; i++) {
+            setScreenPos(screenCanvas[i], left, top, fbSize[i][0], fbSize[i][1])
+            left += w
+        }
+
+    }
+
     uiAdjustVKLayout()
 }
+
 
 
 function uiSwitchTo(mode) {
