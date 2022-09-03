@@ -1,3 +1,26 @@
+var _____WB$wombat$assign$function_____ = function(name) {return (self._wb_wombat && self._wb_wombat.local_init && self._wb_wombat.local_init(name)) || self[name]; };
+if (!self.__WB_pmw) { self.__WB_pmw = function(obj) { this.__WB_source = obj; return this; } }
+{
+  let window = _____WB$wombat$assign$function_____("window");
+  let self = _____WB$wombat$assign$function_____("self");
+  let document = _____WB$wombat$assign$function_____("document");
+  let location = _____WB$wombat$assign$function_____("location");
+  let top = _____WB$wombat$assign$function_____("top");
+  let parent = _____WB$wombat$assign$function_____("parent");
+  let frames = _____WB$wombat$assign$function_____("frames");
+  let opener = _____WB$wombat$assign$function_____("opener");
+
+var VER = 'v20220530'
+function whatsNew() {
+    alert(`What's new in ` + VER + `: 
+1. Offline mode.
+
+EARLY Access features(experimental):
+1. Cheat support (fixed a bug with extremely large cheat lists).
+2. Use the device's microphone (may workable for some speech-recognition games now).
+3. D-Pad virtual key.
+`)
+}
 
 var uiCurrentMode = 'welcome'
 var plugins = {}
@@ -9,6 +32,8 @@ var config = {
     powerSave: true,
     micWhenR: true,
     vkEnabled: true,
+    muteSound: false,
+    useDPad: false
 }
 
 function loadConfig() {
@@ -18,12 +43,14 @@ function loadConfig() {
     }
     $id('power-save').checked = config.powerSave
     $id('vk-enabled').checked = config.vkEnabled
+    $id('cfg-mute-sound').checked = config.muteSound
 }
 loadConfig()
 
 function uiSaveConfig() {
     config.powerSave = !!($id('power-save').checked)
     config.vkEnabled = !!($id('vk-enabled').checked)
+    config.muteSound = !!($id('cfg-mute-sound').checked)
     window.localStorage['config'] = JSON.stringify(config)
 }
 
@@ -37,24 +64,12 @@ function uiMenuBack() {
     }
 }
 
-function uiSaveExport() {
-    if (isSaveSupported) {
-        if (!confirm(`Auto-save is enabled, you DON'T have to export save data manually.
-After you saved in the game, wait a few seconds and save data will be stored in the app's local storage automatically.
-To prevent the data loss caused by accidential deletion of the Home Screen icon or damaged device, you may export the save data to a safe place.
-
-Do you wish to continue?`)) {
-            return
-        }
-        if (prompt('You HAVE to save in the game before exporting the save data.\n\nPlease enter "Yes" to confirm.') !== 'Yes') {
-            return
-        }
-    }
-    var u8Arr = pako.gzip(emuCopySavBuffer())
+function uiSaveBackup() {
+    var u8Arr = emuCopySavBuffer()
     var blob = new Blob([u8Arr], { type: "application/binary" });
     var link = document.createElement("a");
     link.href = window.URL.createObjectURL(blob);
-    link.download = 'sav-' + gameID + '.dsz';
+    link.download = 'sav-' + gameID + '.dsv';
     link.click();
 }
 
@@ -67,42 +82,17 @@ async function uiSaveRestore() {
         alert('Too large!');
         return
     }
-    var fileExt = file.name.split('.').pop().toLowerCase()
-    var allowedExts = {'4dsav': true, 'sav': true, 'dsv': true, '4dsaz': true, 'dsz': true}
-    if (!allowedExts[fileExt]) {
-        alert('Invalid file extension: ' + fileExt)
+    // Only .dsv files are supported
+    if (!file.name.endsWith('.dsv')) {
+        alert('Only .dsv files are supported.\nUse an online converter if your save is in different format.');
         return
     }
-    var u8Arr = new Uint8Array(await file.arrayBuffer())
-    if (fileExt == '4dsav') { 
-        u8Arr = toyEncrypt(u8Arr)
-    }
-    if (fileExt == '4dsaz') {
-        // Use pako to decompress
-        u8Arr = pako.ungzip(toyEncrypt(u8Arr))
-    }
-    if (fileExt == 'dsz') {
-        u8Arr = pako.ungzip(u8Arr)
-    }
-    if (fileExt == 'sav') {
-        var origSave = emuCopySavBuffer()
-        if (origSave.length <= 0) {
-            alert('You have to save in the game at least once, before importing .sav file.')
-            return
-        }
-        if (u8Arr.length > origSave.length) {
-            alert('The .sav file is too large.')
-            return
-        }
-        // Copy the u8Arr to the beginning of origSave, overwriting the original save data.
-        origSave.set(u8Arr, 0)
-        u8Arr = origSave
-    }
-    localforage.setItem('sav-' + gameID, u8Arr).then(() => {
-        alert('Save data updated. \nPlease close and reopen this app.')
+    var u8 = new Uint8Array(await file.arrayBuffer())
+    localforage.setItem('sav-' + gameID, u8).then(() => {
+        alert('Save data updated. \nThis page will be reloaded to apply the changes.')
         setTimeout(() => {
             location.reload()
-        }, 500)
+        }, 1000)
     })
 }
 
@@ -147,7 +137,7 @@ const emuKeyNames = ["right", "left", "down", "up", "select", "start", "b", "a",
 var vkMap = {}
 var vkState = {}
 var keyNameToKeyId = {}
-var vkStickPos = [0, 0, 0, 0, 0]
+var vkStickPos = [0, 0,0,0,0]
 var vkDPadRect = { x: 0, y: 0, w: 0, h: 0 }
 for (var i = 0; i < emuKeyNames.length; i++) {
     keyNameToKeyId[emuKeyNames[i]] = i
@@ -165,7 +155,7 @@ var romSize = 0
 
 var FB = [0, 0]
 var screenCanvas = [document.getElementById('top'), document.getElementById('bottom')]
-var ctx2d;
+var ctx2d = screenCanvas.map((v) => { return v.getContext('2d', { alpha: false }) })
 
 var audioContext
 var audioBuffer
@@ -203,6 +193,22 @@ function showMsg(msg) {
     }, 1000)
 }
 
+function emuRunAudio() {
+    var samplesRead = Module._fillAudioBuffer(4096)
+    if (config.muteSound) {
+        return
+    }
+    for (var i = 0; i < samplesRead; i++) {
+        if (audioFifoLen >= audioFifoCap) {
+            break
+        }
+        var wpos = (audioFifoHead + audioFifoLen) % audioFifoCap
+        audioFifoL[wpos] = audioBuffer[i * 2]
+        audioFifoR[wpos] = audioBuffer[i * 2 + 1]
+        audioFifoLen++
+    }
+}
+
 function emuRunFrame() {
     processGamepadInput()
     var keyMask = 0;
@@ -216,26 +222,17 @@ function emuRunFrame() {
         console.log('mic')
         keyMask |= 1 << 14
     }
-
-
     if (config.powerSave) {
         Module._runFrame(0, keyMask, touched, touchX, touchY)
+        emuRunAudio()
     }
     Module._runFrame(1, keyMask, touched, touchX, touchY)
+    emuRunAudio()
 
     ctx2d[0].putImageData(FB[0], 0, 0)
     ctx2d[1].putImageData(FB[1], 0, 0)
-    if (audioWorkletNode) {
-        try {
-            var samplesRead = Module._fillAudioBuffer(4096)
-            tmpAudioBuffer.set(audioBuffer.subarray(0, samplesRead * 2))
-            audioWorkletNode.port.postMessage(tmpAudioBuffer.subarray(0, samplesRead * 2))
-        } catch (error) {
-            // tmpAudioBuffer may be detached if previous message is still processing 
-            console.log(error)
-        }
-    }
-
+    
+   
     frameCount += 1
     if (frameCount % 120 == 0) {
         var time = performance.now()
@@ -264,6 +261,14 @@ function wasmReady() {
             }
         }
     }, 2000)
+    $id('ver-info').innerText = 'Ver: ' + VER + ' '
+    if ((localStorage['lastver'] || '') != VER) {
+        whatsNew()
+        localStorage['lastver'] = VER
+    }
+    if (isSaveSupported) {
+        $id('hint-auto-save').hidden = false
+    }
 }
 
 function emuCopySavBuffer() {
@@ -382,10 +387,6 @@ function makeVKStyle(top, left, w, h, fontSize) {
     return 'top:' + top + 'px;left:' + left + 'px;width:' + w + 'px;height:' + h + 'px;' + 'font-size:' + fontSize + 'px;line-height:' + h + 'px;'
 }
 
-function makeVKStyle(top, left, w, h, fontSize) {
-    return 'top:' + top + 'px;left:' + left + 'px;width:' + w + 'px;height:' + h + 'px;' + 'font-size:' + fontSize + 'px;line-height:' + h + 'px;'
-}
-
 
 function uiAdjustVKLayout() {
     var baseSize = window.innerWidth * 0.14
@@ -402,8 +403,6 @@ function uiAdjustVKLayout() {
     fontSize = baseSize * 0.5
     vkMap['l'].style = makeVKStyle(offTop, 0, vkw, vkh, fontSize)
     vkMap['r'].style = makeVKStyle(offTop, window.innerWidth - vkw, vkw, vkh, fontSize)
-    vkw = baseSize * 0.4
-    vkh = baseSize * 0.4
     $id('vk-menu').style = makeVKStyle(offTop, window.innerWidth / 2 - vkw / 2, vkw, vkh, fontSize)
 
 
@@ -426,7 +425,7 @@ function uiAdjustVKLayout() {
     var dpadH = abxyHeight
     var dpadX = offLeft
     var dpadY = offTop
-    vkDPadRect = { x: dpadX, y: dpadY, width: dpadW, height: dpadH }
+    vkDPadRect = {x: dpadX, y: dpadY, width: dpadW, height: dpadH}
     $id('vk-dpad-1').style = config.useDPad ? makeVKStyle(dpadY + dpadH / 3, dpadX, dpadW, dpadH / 3, fontSize) : 'display:none;'
     $id('vk-dpad-2').style = config.useDPad ? makeVKStyle(dpadY, dpadX + dpadW / 3, dpadW / 3, dpadH, fontSize) : 'display:none;'
     vkw = baseSize * 0.4
@@ -436,76 +435,27 @@ function uiAdjustVKLayout() {
     vkMap['start'].style = makeVKStyle(offTop + abxyHeight - vkh, window.innerWidth / 2 + vkw * 0.5, vkw, vkh, fontSize)
 }
 
-function maxScreenSize(maxWidth, maxHeight) {
+function uiUpdateLayout() {
+    isLandscape = window.innerWidth > window.innerHeight
+    var maxWidth = window.innerWidth
+    var maxHeight = window.innerHeight / 2
     var w = maxWidth
     var h = w / 256 * 192
     if (h > maxHeight) {
         h = maxHeight
         w = h / 192 * 256
     }
-    return [w, h]
-}
+    var left = 0
+    left += (window.innerWidth - w) / 2;
+    var top = 0
 
-function setScreenPos(c, left, top, w, h) {
-    var sty ='left:' + left + 'px;top:' + top + "px;width:" + w + "px;height:" + h + "px;"
-    if (optScaleMode == 0) {
-        sty += 'image-rendering:pixelated;'
+    fbSize = [[w, h], [w, h]]
+    for (var i = 0; i < 2; i++) {
+        screenCanvas[i].style = 'left:' + left + 'px;top:' + top + "px;width:" + w + "px;height:" + h + "px;"
+        top += h
     }
-    c.style = sty
-    if (optScaleMode >= 2) {
-        var devicePixelRatio = window.devicePixelRatio || 1
-        c.width = w * devicePixelRatio
-        c.height = h * devicePixelRatio
-    }
-}
-
-
-function uiUpdateLayout() {
-    isLandscape = isScreenLandscape()
-    if ((!isLandscape) || (config.lsLayout == 0)) {
-        // Top-bottom
-        var maxWidth = window.innerWidth
-        var maxHeight = window.innerHeight / 2
-        var sz = maxScreenSize(maxWidth, maxHeight); var w = sz[0]; var h = sz[1];
-        var left = 0
-        left += (window.innerWidth - w) / 2;
-        var top = 0
-
-        fbSize = [[w, h], [w, h]]
-        for (var i = 0; i < 2; i++) {
-            setScreenPos(screenCanvas[i], left, top, fbSize[i][0], fbSize[i][1])
-            top += h
-        }
-    } else if (config.lsLayout == 1) {
-        // Left-right 1:1
-        var maxWidth = window.innerWidth / 2
-        var maxHeight = window.innerHeight
-        var sz = maxScreenSize(maxWidth, maxHeight); var w = sz[0]; var h = sz[1];
-        var left = 0
-        var top = 0
-        fbSize = [[w, h], [w, h]]
-        for (var i = 0; i < 2; i++) {
-            setScreenPos(screenCanvas[i], left, top, fbSize[i][0], fbSize[i][1])
-            left += w
-        }
-    } else if (config.lsLayout == 2) {
-        // Left-right X:1
-        var maxWidth = window.innerWidth - 256
-        var maxHeight = window.innerHeight
-        var sz = maxScreenSize(maxWidth, maxHeight); var w = sz[0]; var h = sz[1];
-        var left = 0
-        var top = 0
-        fbSize = [[w, h], [256, 192]]
-        for (var i = 0; i < 2; i++) {
-            setScreenPos(screenCanvas[i], left, top, fbSize[i][0], fbSize[i][1])
-            left += w
-        }
-
-    }
-
     uiAdjustVKLayout()
 }
-
 
 
 function uiSwitchTo(mode) {
@@ -567,7 +517,7 @@ fileInput.onchange = async () => {
         alert('This is a GBA file, redirecting to the GBA player...')
         window.location.href = '/gba';
     } else if (fileNameLower.endsWith('.zip')) {
-        alert('ZIP file not supported yet!')
+        alert('ZIP files are not supported.\nPlease extract the zip file with the File Manager of your OS first.')
     } else if (fileNameLower.endsWith('.nds')) {
         tryLoadROM(file)
         return
@@ -576,6 +526,22 @@ fileInput.onchange = async () => {
     }
 }
 
+function onScriptNodeAudioProcess(e) {
+    var chanL = e.outputBuffer.getChannelData(0)
+    var chanR = e.outputBuffer.getChannelData(1)
+    if (config.muteSound) {
+        return
+    }
+    for (var i = 0; i < chanL.length; i++) {
+        if (audioFifoLen <= 0) {
+            return
+        }
+        audioFifoLen --
+        chanL[i] = audioFifoL[audioFifoHead] / 32768.0
+        chanR[i] = audioFifoR[audioFifoHead] / 32768.0
+        audioFifoHead = (audioFifoHead + 1) % audioFifoCap
+    }
+}
 
 // must be called in user gesture
 function tryInitSound() {
@@ -587,15 +553,9 @@ function tryInitSound() {
             return;
         }
         audioContext = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 0.0001, sampleRate: 48000 });
-        if (!audioContext.audioWorklet) {
-            alert('AudioWorklet is not supported in your browser...')
-        } else {
-            audioContext.audioWorklet.addModule("audio-worklet.js").then(() => {
-                audioWorkletNode = new AudioWorkletNode(audioContext, "my-worklet", { outputChannelCount: [2] })
-                audioWorkletNode.connect(audioContext.destination)
-            })
-        }
-
+        scriptNode = audioContext.createScriptProcessor(2048, 0, 2);
+        scriptNode.onaudioprocess = onScriptNodeAudioProcess;
+        scriptNode.connect(audioContext.destination);
         audioContext.resume()
     } catch (e) {
         console.log(e)
@@ -603,21 +563,22 @@ function tryInitSound() {
     }
 }
 
-var prevRunFrameTime = performance.now()
 function emuLoop() {
     window.requestAnimationFrame(emuLoop)
 
-    if (emuIsRunning) {
-        if (config.powerSave) {
-            if (performance.now() - prevRunFrameTime < 32) {
-                return
-            }
-        }
+    if (emuIsRunning && (!config.powerSave)) {
         prevRunFrameTime = performance.now()
         emuRunFrame()
     }
 }
 emuLoop()
+
+function emuTimer33() {
+    if (emuIsRunning && config.powerSave) {
+        emuRunFrame()
+    }
+}
+setInterval(emuTimer33, 33)
 
 var stickTouchID = null
 var tpadTouchID = null
@@ -679,34 +640,53 @@ function handleTouch(event) {
         var tid = t.identifier
         var dom = document.elementFromPoint(t.clientX, t.clientY)
         var k = dom ? dom.getAttribute('data-k') : null
-
-        if ((tid === stickTouchID) || ((dom == vkMap['stick']) && (tid != tpadTouchID))) {
-            stickPressed = true
-
-            vkState['stick'][1] = 1
-            var sx = t.clientX
-            var sy = t.clientY
-            if (sx < stickX - stickDeadZone) {
-                emuKeyState[1] = true
+        if (config.useDPad) {
+            if (isPointInRect(t.clientX, t.clientY, vkDPadRect)) {
+                var xgrid = Math.floor((t.clientX - vkDPadRect.x) / vkDPadRect.width * 3)
+                var ygrid = Math.floor((t.clientY - vkDPadRect.y) / vkDPadRect.height * 3)
+                var xygrid = xgrid + ygrid * 3
+                if (xygrid == 5)
+                    // right
+                    emuKeyState[0] = true
+                else if (xygrid == 3)
+                    // left
+                    emuKeyState[1] = true
+                else if (xygrid == 7)
+                    // down
+                    emuKeyState[2] = true
+                else if (xygrid == 1)
+                    // up
+                    emuKeyState[3] = true
             }
-            if (sx > stickX + stickDeadZone) {
-                emuKeyState[0] = true
+        } else {
+            if ((tid === stickTouchID) || ((dom == vkMap['stick']) && (tid != tpadTouchID))) {
+                stickPressed = true
+    
+                vkState['stick'][1] = 1
+                var sx = t.clientX
+                var sy = t.clientY
+                if (sx < stickX - stickDeadZone) {
+                    emuKeyState[1] = true
+                }
+                if (sx > stickX + stickDeadZone) {
+                    emuKeyState[0] = true
+                }
+                if (sy < stickY - stickDeadZone) {
+                    emuKeyState[3] = true
+                }
+                if (sy > stickY + stickDeadZone) {
+                    emuKeyState[2] = true
+                }
+                sx = Math.max(stickX - stickW / 2, sx)
+                sx = Math.min(stickX + stickW / 2, sx)
+                sy = Math.max(stickY - stickH / 2, sy)
+                sy = Math.min(stickY + stickH / 2, sy)
+                stickX = sx
+                stickY = sy
+                needUpdateStick = true
+                nextStickTouchID = tid
+                continue
             }
-            if (sy < stickY - stickDeadZone) {
-                emuKeyState[3] = true
-            }
-            if (sy > stickY + stickDeadZone) {
-                emuKeyState[2] = true
-            }
-            sx = Math.max(stickX - stickW / 2, sx)
-            sx = Math.min(stickX + stickW / 2, sx)
-            sy = Math.max(stickY - stickH / 2, sy)
-            sy = Math.min(stickY + stickH / 2, sy)
-            stickX = sx
-            stickY = sy
-            needUpdateStick = true
-            nextStickTouchID = tid
-            continue
         }
         if ((tid === tpadTouchID) || (isPointInRect(t.clientX, t.clientY, tsRect) && (!k))) {
             isDown = true
@@ -716,7 +696,6 @@ function handleTouch(event) {
             continue
         }
         if (k) {
-
             vkState[k][1] = 1
             continue
         }
@@ -731,12 +710,12 @@ function handleTouch(event) {
             var dom = vkMap[k]
             vkState[k][0] = vkState[k][1]
             if (vkState[k][1]) {
-                dom.classList.add('vk-touched')
+                //dom.classList.add('vk-touched')
                 if (k == 'menu') {
                     uiSwitchTo('menu')
                 }
             } else {
-                dom.classList.remove('vk-touched')
+                //dom.classList.remove('vk-touched')
                 if (k == "stick") {
                     needUpdateStick = true
                 }
@@ -873,14 +852,6 @@ function processGamepadInput() {
     }
 }
 
-function whatsNew() {
-    alert(`
-1. Improve auto-save, export/import save.
-2. Add gamepad guide.
-3. Add link to gba player.
-4. Cheat support. (Early Access)
-`)
-}
 
 
 var isMicrophoneEnabled = false
@@ -889,19 +860,18 @@ function enableMicrophone() {
         alert('Microphone is already enabled.')
         return
     }
+    tryInitSound()
     isMicrophoneEnabled = true
     var micPtr = Module._realloc(0, 0x1000)
     var micBuf = Module.HEAPU8.subarray(micPtr, micPtr + 0x1000)
-    console.log(micPtr, micBuf)
+    // console.log(micPtr, micBuf)
     // Request access to the Microphone, and get raw PCM samples at 8000Hz, use WebAudio API
     navigator.mediaDevices.getUserMedia({ audio: true, video: false })
         .then(function (stream) {
-            // Create an new AudioContext, which is required for WebAudio API
-            var audioCtx = new AudioContext();
             // Create a MediaStreamSource from the stream
-            var source = audioCtx.createMediaStreamSource(stream);
+            var source = audioContext.createMediaStreamSource(stream);
             // Create a ScriptProcessorNode with a bufferSize of 2048
-            var scriptNode = audioCtx.createScriptProcessor(2048, 1, 1);
+            var scriptNode = audioContext.createScriptProcessor(2048, 1, 1);
             // Connect the ScriptProcessorNode to the MediaStreamSource
             source.connect(scriptNode);
             // Connect the ScriptProcessorNode to the destination
@@ -910,13 +880,16 @@ function enableMicrophone() {
                 // Convert to 16000Hz 7bit mono PCM
                 var dstPtr = 0;
                 for (var i = 0; i <= 2045; i+=3) {
-                    var val = Math.floor(((buf[i] + buf[i + 1] + buf[i + 2]) / 3 + 1) * 64)
+                    var val = (buf[i] + buf[i + 1] + buf[i + 2]) / 3 
+                    // Convert -1~1 to 0~127
+                    val = Math.floor(val * 64 + 64)
                     if (val > 127) {
                         val = 127
                     } else if (val < 0) {
                         val = 0
                     }
-                    micBuf[dstPtr++] = val
+                    micBuf[dstPtr] = val
+                    dstPtr++
                 }
                 // Write to the buffer
                 Module._micWriteSamples(micPtr, 682)
@@ -927,9 +900,68 @@ function enableMicrophone() {
                     }
                 }
             }
-            scriptNode.connect(audioCtx.destination);
+            scriptNode.connect(audioContext.destination);
            
         });
 }
 
 
+
+
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').then(function(reg) {
+        // registration worked
+        console.log('Registration succeeded. Scope is ' + reg.scope);
+    }).catch(function(error) {
+        // registration failed
+        console.log('Registration failed with ' + error);
+    });
+    navigator.serviceWorker.addEventListener('message', event => {
+        console.log('sw msg', event);
+        if (event.data.msg) {
+            $id('whats-new').innerText = event.data.msg
+        }
+    });
+}
+(function() {
+
+    var cnt = 0;
+    // Prompt to install PWA
+    window.onbeforeinstallprompt = function(e) {
+        cnt += 1;
+        if (cnt > 2) {
+            return;
+        }
+        console.log('Before install prompt', e);
+        e.preventDefault();
+        var deferredPrompt = e;
+        window.onclick = function(e) {
+            deferredPrompt.prompt();
+            window.onclick = null;
+        }
+    };
+})();
+
+}
+/*
+     FILE ARCHIVED ON 09:10:06 Jul 12, 2022 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 11:40:09 Sep 03, 2022.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+*/
+/*
+playback timings (ms):
+  captures_list: 152.071
+  exclusion.robots: 0.089
+  exclusion.robots.policy: 0.077
+  cdx.remote: 0.05
+  esindex: 0.006
+  LoadShardBlock: 122.631 (3)
+  PetaboxLoader3.datanode: 122.664 (4)
+  CDXLines.iter: 14.116 (3)
+  load_resource: 209.828
+  PetaboxLoader3.resolve: 191.298
+*/
