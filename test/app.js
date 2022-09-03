@@ -400,6 +400,8 @@ function uiAdjustVKLayout() {
     fontSize = baseSize * 0.5
     vkMap['l'].style = makeVKStyle(offTop, 0, vkw, vkh, fontSize)
     vkMap['r'].style = makeVKStyle(offTop, window.innerWidth - vkw, vkw, vkh, fontSize)
+    vkw = baseSize * 0.4
+    vkh = baseSize * 0.4
     $id('vk-menu').style = makeVKStyle(offTop, window.innerWidth / 2 - vkw / 2, vkw, vkh, fontSize)
 
 
@@ -415,15 +417,23 @@ function uiAdjustVKLayout() {
     vkw = baseSize * 1.0
     vkh = baseSize * 1.0
     offLeft = 0
-    $id('vk-stick').style = makeVKStyle(offTop + abxyHeight / 2 - vkh / 2, offLeft + abxyHeight / 2 - vkw / 2, vkw, vkh, fontSize)
+    $id('vk-stick').style = config.useDPad ? 'display:none;' : makeVKStyle(offTop + abxyHeight / 2 - vkh / 2, offLeft + abxyHeight / 2 - vkw / 2, vkw, vkh, fontSize)
     vkStickPos = [offTop + abxyHeight / 2, offLeft + abxyHeight / 2, vkw, vkh, fontSize]
 
+    var dpadW = abxyWidth
+    var dpadH = abxyHeight
+    var dpadX = offLeft
+    var dpadY = offTop
+    vkDPadRect = { x: dpadX, y: dpadY, width: dpadW, height: dpadH }
+    $id('vk-dpad-1').style = config.useDPad ? makeVKStyle(dpadY + dpadH / 3, dpadX, dpadW, dpadH / 3, fontSize) : 'display:none;'
+    $id('vk-dpad-2').style = config.useDPad ? makeVKStyle(dpadY, dpadX + dpadW / 3, dpadW / 3, dpadH, fontSize) : 'display:none;'
     vkw = baseSize * 0.4
     vkh = baseSize * 0.4
-    fontSize = baseSize * 0.4
+    fontSize = baseSize * 0.2
     vkMap['select'].style = makeVKStyle(offTop + abxyHeight - vkh, window.innerWidth / 2 - vkw * 1.5, vkw, vkh, fontSize)
     vkMap['start'].style = makeVKStyle(offTop + abxyHeight - vkh, window.innerWidth / 2 + vkw * 0.5, vkw, vkh, fontSize)
 }
+
 
 function uiUpdateLayout() {
     isLandscape = window.innerWidth > window.innerHeight
