@@ -142,12 +142,13 @@ if (isMacOS) {
     }
 }
 
-var emuKeyState = new Array(14)
+ var emuKeyState = new Array(14)
 const emuKeyNames = ["right", "left", "down", "up", "select", "start", "b", "a", "y", "x", "l", "r", "debug", "lid"]
 var vkMap = {}
 var vkState = {}
 var keyNameToKeyId = {}
-var vkStickPos
+var vkStickPos = [0, 0, 0, 0, 0]
+var vkDPadRect = { x: 0, y: 0, w: 0, h: 0 }
 for (var i = 0; i < emuKeyNames.length; i++) {
     keyNameToKeyId[emuKeyNames[i]] = i
 }
@@ -164,12 +165,17 @@ var romSize = 0
 
 var FB = [0, 0]
 var screenCanvas = [document.getElementById('top'), document.getElementById('bottom')]
-var ctx2d = screenCanvas.map((v) => { return v.getContext('2d', { alpha: false }) })
+var ctx2d;
 
 var audioContext
 var audioBuffer
-var tmpAudioBuffer = new Int16Array(16384 * 2)
-var audioWorkletNode
+var scriptNode
+const audioFifoCap = 8192
+var audioFifoL = new Int16Array(audioFifoCap)
+var audioFifoR = new Int16Array(audioFifoCap)
+var audioFifoHead = 0
+var audioFifoLen = 0
+
 
 var frameCount = 0
 var prevCalcFPSTime = 0
@@ -179,6 +185,8 @@ var touchY = 0
 var prevSaveFlag = 0
 var lastTwoFrameTime = 10
 var fbSize
+
+
 
 
 function callPlugin(type, arg) {
