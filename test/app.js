@@ -1,4 +1,5 @@
 
+var optScaleMode = 0
 var uiCurrentMode = 'welcome'
 var plugins = {}
 var body = document.getElementsByTagName("body")[0]
@@ -9,6 +10,20 @@ var config = {
     powerSave: true,
     micWhenR: true,
     vkEnabled: true,
+    muteSound: false,
+    useDPad: false,
+    lsLayout: 0,
+    turbo: false,
+    scaleMode: 0,
+    fwLang: 1,
+}
+var emuUseTimer33 = false
+
+function afterConfigUpdated() {
+    emuUseTimer33 = false
+    if (config.powerSave || config.turbo) {
+        emuUseTimer33 = true
+    }
 }
 
 function loadConfig() {
@@ -18,14 +33,34 @@ function loadConfig() {
     }
     $id('power-save').checked = config.powerSave
     $id('vk-enabled').checked = config.vkEnabled
+    $id('cfg-mute-sound').checked = config.muteSound
+    $id('vk-direction').value = config.useDPad ? "1" : "0"
+    $id('cfg-turbo').checked = config.turbo
+    $id('cfg-ls-layout').value = config.lsLayout
+    $id('cfg-scale-mode').value = config.scaleMode
+    $id('cfg-lang').value = config.fwLang
+    afterConfigUpdated()
+    optScaleMode = config.scaleMode
 }
 loadConfig()
+
+
+
 
 function uiSaveConfig() {
     config.powerSave = !!($id('power-save').checked)
     config.vkEnabled = !!($id('vk-enabled').checked)
+    config.muteSound = !!($id('cfg-mute-sound').checked)
+    config.useDPad = !!parseInt($id('vk-direction').value)
+    config.turbo = !!($id('cfg-turbo').checked)
+    config.lsLayout = parseInt($id('cfg-ls-layout').value)
+    config.scaleMode = parseInt($id('cfg-scale-mode').value)
+    config.fwLang = parseInt($id('cfg-lang').value)
     window.localStorage['config'] = JSON.stringify(config)
+    afterConfigUpdated()
 }
+
+
 
 
 function uiMenuBack() {
@@ -35,6 +70,15 @@ function uiMenuBack() {
     } else {
         uiSwitchTo('welcome')
     }
+}
+
+
+function toyEncrypt(src) {
+    var dst = new Uint8Array(src.length)
+    for (var i = 0; i < src.length; i++) {
+        dst[i] = src[i] ^ 0xFB
+    }
+    return dst
 }
 
 function uiSaveExport() {
