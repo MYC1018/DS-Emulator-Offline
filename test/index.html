@@ -131,18 +131,13 @@
         }
     </style>
     <div id="welcome" class="menu">
-        <h1>DS Player</h1>
-        <div id="loading">Loading...</div>
+        
+        <div id="loading">読み込み中</div>
         <div id="loadrom" hidden>
             <input id="rom" type="file" hidden>
-            <button style="width:calc(100% - 2em);margin: 1em;" id="btn-choose-file">Choose File (or
-                drag/drop)...</button><br>
+            <button style="width:calc(100% - 2em);margin: 1em;" id="btn-choose-file">ファイルを選択</button><br>
         </div>
-        <p style="color: #888;">
-            Your files are processed locally and won't be uploaded to any server.<br>
-            This software should not be used to play games you have not legally obtained.<br>
-            "Nintendo DS" is a trademark of Nintendo. This site is not associated with Nintendo in any way.
-        </p>
+        
         <hr>
         <p><span id="ver-info"></span><a onclick="whatsNew()" id="whats-new" href="#">What's New</a>&nbsp;|&nbsp;<a
                 href="#" onclick="uiSwitchTo('menu')">⚙ Settings...</a></p>
@@ -150,17 +145,16 @@
             <a href="/gba/">GBA Player</a>
         </p>
         <p>
-            <a href="https://github.com/44670/desmume-wasm">Help</a>&nbsp;|&nbsp;<a href="#" id="a-gamepad">No
+        <a href="#" id="a-gamepad">No
                 Gamepad</a>
         </p>
         <p>
-            Powered by <a
-                href="https://github.com/44670/desmume-wasm">desmume-wasm.</a>&nbsp;|&nbsp;https://ds.44670.org<br>
+            
         </p>
 
 
         <div id="pro" style="background-color: #333">
-        </div>
+        </div><span hidden>
         <p id="ios-power-hint" hidden>
             Please <b>turn off "Low Power Mode"</b> in iOS Control Center for better performance.<br>The battery icon is yellow if it's enabled.
         </p>
@@ -176,7 +170,7 @@
             will be LOST after 7 days of inactivity.<br>
             For this reason, it is highly recommended to use a different browser. (For example: <a
                 href="https://www.google.com/chrome/">Chrome</a>)
-        </div>
+        </div></span>
     </div>
     <div id="vk-layer" hidden>
         <div class="vk-rect vk" data-k="menu" id="vk-menu">M</div>
