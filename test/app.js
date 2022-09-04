@@ -63,8 +63,11 @@ function uiSaveConfig() {
 
 
 
+
 function uiMenuBack() {
+    tryInitSound()
     uiSaveConfig()
+
     if (emuIsGameLoaded) {
         uiSwitchTo('player')
     } else {
@@ -314,10 +317,17 @@ function wasmReady() {
         var btn = $id('btn-choose-file')
         if (!btn.onclick) {
             btn.onclick = () => {
+                tryInitSound()
                 $id('rom').click()
             }
         }
     }, 2000)
+    $id('ver-info').innerText = 'Ver: ' + VER + ' '
+    if (optScaleMode < 2) {
+        ctx2d = screenCanvas.map((v) => { return v.getContext('2d', { alpha: false }) })
+    } else {
+        gpuInit()
+    }
 }
 
 function emuCopySavBuffer() {
