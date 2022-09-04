@@ -241,6 +241,22 @@ function showMsg(msg) {
     }, 1000)
 }
 
+function emuRunAudio() {
+    var samplesRead = Module._fillAudioBuffer(4096)
+    if (config.muteSound) {
+        return
+    }
+    for (var i = 0; i < samplesRead; i++) {
+        if (audioFifoLen >= audioFifoCap) {
+            break
+        }
+        var wpos = (audioFifoHead + audioFifoLen) % audioFifoCap
+        audioFifoL[wpos] = audioBuffer[i * 2]
+        audioFifoR[wpos] = audioBuffer[i * 2 + 1]
+        audioFifoLen++
+    }
+}
+
 function emuRunFrame() {
     processGamepadInput()
     var keyMask = 0;
@@ -609,6 +625,22 @@ fileInput.onchange = async () => {
     }
 }
 
+function onScriptNodeAudioProcess(e) {
+    var chanL = e.outputBuffer.getChannelData(0)
+    var chanR = e.outputBuffer.getChannelData(1)
+    if (config.muteSound) {
+        return
+    }
+    for (var i = 0; i < chanL.length; i++) {
+        if (audioFifoLen <= 0) {
+            return
+        }
+        audioFifoLen--
+        chanL[i] = audioFifoL[audioFifoHead] / 32768.0
+        chanR[i] = audioFifoR[audioFifoHead] / 32768.0
+        audioFifoHead = (audioFifoHead + 1) % audioFifoCap
+    }
+}
 
 // must be called in user gesture
 function tryInitSound() {
