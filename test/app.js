@@ -597,7 +597,6 @@ function uiSwitchTo(mode) {
 }
 
 fileInput.onchange = async () => {
-    tryInitSound()
     var file = fileInput.files[0]
     if (!file) {
         return
@@ -616,7 +615,9 @@ fileInput.onchange = async () => {
         alert('This is a GBA file, redirecting to the GBA player...')
         window.location.href = '/gba';
     } else if (fileNameLower.endsWith('.zip')) {
-        alert('ZIP file not supported yet!')
+        alert('ZIP files are not supported.\nOn iOS, you can unzip it with the built-in Files app.')
+    } else if (fileNameLower.endsWith('.3ds')) {
+        alert('No, 3DS is not supported.')
     } else if (fileNameLower.endsWith('.nds')) {
         tryLoadROM(file)
         return
