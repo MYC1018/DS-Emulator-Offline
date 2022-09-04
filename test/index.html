@@ -215,15 +215,15 @@
         </div>
         <hr>
         <input type="checkbox" id="power-save">
-        <label for="power-save">30FPS limit</label><br>
+        <label for="power-save">30FPSに制限</label><br>
         <input type="checkbox" id="vk-enabled">
-        <label for="vk-enabled">Virtual gamepad</label><br>
+        <label for="vk-enabled">仮想コントローラー</label><br>
         <input type="checkbox" id="cfg-mute-sound" hidden>
         <label for="cfg-mute-sound" hidden>Mute sound</label><br>
-        <label for="vk-direction">Virtual gamepad Style</label>
+        <label for="vk-direction">仮想コントローラースタイル</label>
         <select id="vk-direction" value="">
-            <option value="0">Circle-Pad</option>
-            <option value="1">D-Pad</option>
+            <option value="0">スティック</option>
+            <option value="1">十字</option>
         </select><br><span hidden>
         <label for="cfg-lang">Firmware Language</label>
         <select id="cfg-lang">
@@ -238,8 +238,8 @@
         <hr>
         <div id="menu-savegame" hidden>
             <input type="file" id="restore-file" onchange="uiSaveRestore()" hidden>
-            Save Data: <button onclick="uiSaveExport()">↓ Backup</button>|<button
-                onclick="$id('restore-file').click()">↑ Restore</button><br>
+            セーブデータ: <button onclick="uiSaveExport()">↓ バックアップ</button>|<button
+                onclick="$id('restore-file').click()">↑ 読み込み/復元</button><br>
             <hr>
         </div>
     </div>
