@@ -912,10 +912,10 @@ window.onkeydown = window.onkeyup = (e) => {
 
 var currentConnectedGamepad = -1
 var gamePadKeyMap = {
-    a: 1,
-    b: 0,
-    x: 3,
-    y: 2,
+    a: 3,
+    b: 1,
+    x: 2,
+    y: 0,
     l: 4,
     r: 5,
     'select': 8,
