@@ -3,6 +3,8 @@ var CACHE_NAME = 'v43';
 
 var urlsToCache = [
     '/',
+    '/main.html',
+    '/index.html',
     '/app.js',
     '/localforage.js',
     '/pako.min.js',
