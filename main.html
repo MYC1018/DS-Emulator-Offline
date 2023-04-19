@@ -270,6 +270,11 @@ btnReload.addEventListener('click', function(){
 <label for="power-save">省電力モード</label><br> 
 <input type="checkbox" id="vk-enabled"> 
 <label for="vk-enabled">仮想キーボード</label><br> 
+	<label for="vk-direction">Virtual gamepad Style</label> 
+<select id="vk-direction" value=""> 
+<option value="0">Circle-Pad</option> 
+<option value="1">D-Pad</option> 
+</select>
 <hr> 
 <div id="menu-savegame" hidden> 
 <input type="file" id="restore-file" onchange="uiSaveRestore()" hidden> 
